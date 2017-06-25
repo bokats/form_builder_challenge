@@ -1,15 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-
-class Root extends React.Component {
-  render() {
-    return(
-      <div>
-        React is up and running!
-      </div>
-    );
-  }
-}
+import Root from './components/root';
 
 document.addEventListener('DOMContentLoaded', () => {
   ReactDOM.render(<Root/>, document.getElementById('main'));

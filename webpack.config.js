@@ -1,8 +1,8 @@
-const path = require('path')
+const path = require('path');
 
 module.exports = {
   context: __dirname,
-  entry: "./frontend/root.jsx",
+  entry: "./frontend/form_builder.jsx",
   output: {
     path: path.resolve(__dirname),
     filename: "bundle.js"
