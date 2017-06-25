@@ -4,7 +4,6 @@ import { hashHistory, router } from 'react-router';
 class NavBar extends React.Component {
   constructor(props) {
     super(props);
-    this.changePath = this.changePath.bind(this);
   }
 
   changePath(location) {
