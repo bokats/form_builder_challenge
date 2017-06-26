@@ -1,12 +1,33 @@
 import React from 'react';
+import SubInput from '../subinput/subinput';
 
 class Input extends React.Component {
   constructor(props) {
     super(props);
     this.state = {question: props.data.question,type: props.data.type,
-      subtype: props.data.subtype, input: props.data.input};
+      subtype: props.data.subtype, input: props.data.input,
+      subinputs: props.data.subinputs};
     this.update = this.update.bind(this);
+    this.addSubInput = this.addSubInput.bind(this);
     this.localStorage = JSON.parse(localStorage.getItem('formInputs'));
+    this.parentState = this;
+  }
+
+  addSubInput(e) {
+    e.preventDefault();
+    let subInputNumber;
+    if (this.state.subinputs) {
+      subInputNumber = Object.keys(this.localStorage[this.props.input].
+        subinputs).length + 1;
+    } else {
+      this.localStorage[this.props.input]['subinputs']= {};
+      subInputNumber = 1;
+    }
+    this.localStorage[this.props.input].subinputs[subInputNumber] =
+    {condition: "", question: "", type: "text", subtype: ""};
+    localStorage.setItem('formInputs', JSON.stringify(this.localStorage));
+    this.setState({['subinputs']: this.localStorage[this.props.input].
+      subinputs});
   }
 
   update(field) {
@@ -30,6 +51,9 @@ class Input extends React.Component {
         </label>
       );
     }
+
+    let subinputs = Object.keys(this.state.subinputs);
+
     return (
       <div className="input-container">
         <label>Question
@@ -38,7 +62,7 @@ class Input extends React.Component {
             onChange={this.update('question')}/>
         </label>
         <label>Type
-          <select onChange={this.update('type')}>
+          <select value={this.state.type} onChange={this.update('type')}>
             <option value="text">Text</option>
             <option value="number">Number</option>
             <option value="yes/no">Yes/No</option>
@@ -50,8 +74,16 @@ class Input extends React.Component {
             value={this.state.answer}
             onChange={this.update('answer')}/>
         </label>
-        <button className='add-subinput-button'>Add Sub-Input</button>
-        <button className='delete-button'>Delete Input</button>
+        <button onClick={this.addSubInput}>Add Sub-Input</button>
+        <button onClick={this.props.parentState.deleteInput(this.props.input)}>
+          Delete Input</button>
+        <div>
+          {subinputs.map(subinput => {
+            return (
+              <SubInput key={subinput} data={this.state.subinputs[`${subinput}`]}
+                subinput={subinput} parentState={this.parentState}/>);
+              })}
+        </div>
       </div>
     );
   }

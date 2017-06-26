@@ -12,15 +12,26 @@ class Create extends React.Component {
       localStorage.setItem('formInputs',JSON.stringify({}));
     }
     this.createInput = this.createInput.bind(this);
+    this.deleteInput = this.deleteInput.bind(this);
+    this.parentState = this;
   }
 
   createInput(e) {
     e.preventDefault();
     let currentInputs = this.state.formState;
     currentInputs[`input${Object.keys(currentInputs).length + 1}`] =
-    {question: "", type: "text", subtype: "", input: ""};
+    {question: "", type: "text", subtype: "", input: "", subinputs: {}};
     localStorage.setItem('formInputs', JSON.stringify(currentInputs));
     this.setState({['formState']: currentInputs});
+  }
+
+  deleteInput(input) {
+    return e => {
+      let currentInputs = this.state.formState;
+      delete currentInputs[input];
+      localStorage.setItem('formInputs', JSON.stringify(currentInputs));
+      this.setState({['formState']: currentInputs});
+    };
   }
 
   render() {
@@ -29,7 +40,8 @@ class Create extends React.Component {
       <div className='create-container'>
         {inputs.map(input => {
           return (
-          <Input key={input} data={this.state.formState[`${input}`]} input={input}/>);
+          <Input key={input} data={this.state.formState[`${input}`]}
+            input={input} parentState={this.parentState}/>);
         })}
         <button className='add-input-button' onClick={this.createInput}>
           Add Input
