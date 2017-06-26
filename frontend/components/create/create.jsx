@@ -28,7 +28,7 @@ class Create extends React.Component {
       <div className='create-container'>
         {inputs.map(input => {
           return (
-          <Input key={input} data={this.state.formState.input}/>);
+          <Input key={input} data={this.state.formState.input} input={input}/>);
         })}
         <button className='add-input-button' onClick={this.createInput}>
           Add Input
