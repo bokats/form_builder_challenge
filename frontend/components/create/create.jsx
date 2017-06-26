@@ -17,7 +17,8 @@ class Create extends React.Component {
   createInput(e) {
     e.preventDefault();
     let currentInputs = this.state.formState;
-    currentInputs[`input${Object.keys(currentInputs).length + 1}`] = {};
+    currentInputs[`input${Object.keys(currentInputs).length + 1}`] =
+    {question: "", type: "text", subtype: "", input: ""};
     localStorage.setItem('formInputs', JSON.stringify(currentInputs));
     this.setState({['formState']: currentInputs});
   }
@@ -28,7 +29,7 @@ class Create extends React.Component {
       <div className='create-container'>
         {inputs.map(input => {
           return (
-          <Input key={input} data={this.state.formState.input} input={input}/>);
+          <Input key={input} data={this.state.formState[`${input}`]} input={input}/>);
         })}
         <button className='add-input-button' onClick={this.createInput}>
           Add Input
