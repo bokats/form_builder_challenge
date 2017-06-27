@@ -51,9 +51,19 @@ class SubInput extends React.Component {
       let path = this.props.path.split(".subinputs.");
       let currentElement = this.findElement(path);
       currentElement[field] = e.currentTarget.value;
-      this.localStorage = set(this.localStorage, this.props.path, currentElement);
-      localStorage.setItem('formInputs', JSON.stringify(this.localStorage));
-      this.setState({[field]: e.currentTarget.value});
+
+      let p1 = new Promise((resolve, reject) => {
+        resolve(this.localStorage = set(this.localStorage, this.props.path, currentElement));
+      });
+
+      let p2 = new Promise((resolve, reject) => {
+        resolve(localStorage.setItem('formInputs', JSON.stringify(this.localStorage)));
+      });
+
+      let target = e.currentTarget.value;
+      p1.then(() => p2.then(() => {
+        this.setState({[field]: target});
+      }));
     };
   }
 
@@ -68,9 +78,9 @@ class SubInput extends React.Component {
     let currentElement = this.findElement(path);
     delete currentElement.subinputs[subinput];
     let p1 = new Promise((resolve, reject) => {
-      resolve();
+      resolve(this.localStorage =
+        set(this.localStorage, this.props.path, currentElement));
     });
-    this.localStorage = set(this.localStorage, this.props.path, currentElement);
 
     let p2 = new Promise((resolve, reject) => {
       resolve(localStorage.setItem('formInputs', JSON.stringify(this.localStorage)));
@@ -78,7 +88,6 @@ class SubInput extends React.Component {
 
     p1.then(() => p2.then(() =>
       this.setState({['subinputs']: currentElement.subinputs})));
-
   }
 
   updateConditional(field) {
@@ -89,8 +98,11 @@ class SubInput extends React.Component {
       parentType = 'input';
     }
     return e => {
-      this.props.parentState.update(parentType)(e);
-      this.updateInput(field)(e);
+      let p1 = new Promise((resolve, reject) => {
+        this.props.parentState.updateInput(parentType)(e);
+      });
+
+      p1.then(() => this.updateInput(field)(e));
     };
 
   }
@@ -195,7 +207,7 @@ class SubInput extends React.Component {
         <label>Input
           <input type='text' placeholder='Type your input answer'
             value={this.state.input}
-            onChange={this.updateInput('answer')}/>
+            onChange={this.updateInput('input')}/>
         </label>
         <button onClick={this.addSubInput}>Add Sub-Input</button>
         <button onClick={this.deleteSelf(this.props.subinput)}>

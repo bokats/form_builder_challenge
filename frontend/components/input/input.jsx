@@ -7,7 +7,7 @@ class Input extends React.Component {
     this.state = {question: props.data.question,type: props.data.type,
       subtype: props.data.subtype, input: props.data.input,
       subinputs: props.data.subinputs};
-    this.update = this.update.bind(this);
+    this.updateInput = this.updateInput.bind(this);
     this.addSubInput = this.addSubInput.bind(this);
     this.deleteSelf = this.deleteSelf.bind(this);
     this.deleteChild = this.deleteChild.bind(this);
@@ -48,25 +48,54 @@ class Input extends React.Component {
     return max + 1;
   }
 
-  update(field) {
+  updateInput(field) {
     return e => {
       this.localStorage[this.props.input][field] = e.currentTarget.value;
       let newState = JSON.stringify(this.localStorage);
-      setTimeout(function(){
-        localStorage.setItem('formInputs', newState);
-      }, 500);
-      this.setState({[field]: e.currentTarget.value});
-      if (field === 'type' && e.currentTarget.value !== 'number' &&
-        this.state.subtype !== 'equals') {
-          this.updateSubType();
-        }
+      let value = e.currentTarget.value;
+
+      let p1 = new Promise((resolve, reject) => {
+        resolve(localStorage.setItem('formInputs', newState));
+        this.updateChildren(field, value);
+      });
+
+      let p2 = new Promise((resolve, reject) => {
+        resolve(this.setState({[field]: value}));
+      });
+
+      p1.then(() => p2.then(() => {
+        this.updateSubType(field, value);
+      }));
     };
   }
 
-  updateSubType() {
-    this.localStorage[this.props.input]['subtype'] = 'equals';
+  updateSubType(field, value) {
+    if (field === 'type' && value !== 'number' &&
+    this.state.subtype !== 'equals') {
+      this.localStorage[this.props.input]['subtype'] = 'equals';
+      let p1 = new Promise((resolve, reject) => {
+        resolve(localStorage.setItem('formInputs', JSON.stringify(this.localStorage)));
+      });
+      p1.then(() => this.setState({['subtype']: 'equals'}));
+    }
+  }
+
+  updateChildren(field, value) {
+    let childParam;
+    if (field === 'input') {
+      childParam = 'conditionInput';
+    } else if (field === 'subtype') {
+      childParam = 'conditionType';
+    } else {
+      return;
+    }
+    let keys = Object.keys(this.localStorage[this.props.input].subinputs);
+
+    for (let i = 0; i < keys.length; i++) {
+      this.localStorage[this.props.input].subinputs[keys[i]][childParam]
+      = value;
+    }
     localStorage.setItem('formInputs', JSON.stringify(this.localStorage));
-    this.setState({['subtype']: 'equals'});
   }
 
   deleteSelf(input) {
@@ -94,7 +123,7 @@ class Input extends React.Component {
     if (this.state.type === "number") {
       subtype = (
         <label>Number type
-          <select value={this.state.subtype} onChange={this.update('subtype')}>
+          <select value={this.state.subtype} onChange={this.updateInput('subtype')}>
             <option value="greater-than">Greater than</option>
             <option value="equals">Equals</option>
             <option value="less-than">Less than</option>
@@ -120,10 +149,10 @@ class Input extends React.Component {
         <label>Question
           <input type='text' placeholder='Type your input question'
             value={this.state.question}
-            onChange={this.update('question')}/>
+            onChange={this.updateInput('question')}/>
         </label>
         <label>Type
-          <select value={this.state.type} onChange={this.update('type')}>
+          <select value={this.state.type} onChange={this.updateInput('type')}>
             <option value="text">Text</option>
             <option value="number">Number</option>
             <option value="yes/no">Yes/No</option>
@@ -133,7 +162,7 @@ class Input extends React.Component {
         <label>Input
           <input type='text' placeholder='Type your input answer'
             value={this.state.input}
-            onChange={this.update('input')}/>
+            onChange={this.updateInput('input')}/>
         </label>
         <button onClick={this.addSubInput}>Add Sub-Input</button>
         <button onClick={this.deleteSelf(this.props.input)}>
