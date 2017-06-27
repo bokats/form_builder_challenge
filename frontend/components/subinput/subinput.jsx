@@ -22,11 +22,10 @@ class SubInput extends React.Component {
     let subInputNumber = this.findNextNumber(Object.keys(this.state.subinputs));
     let path = this.props.path.split(".subinputs.");
     let currentElement = this.findElement(path);
-    console.log(currentElement);
     currentElement.subinputs[subInputNumber] = {
       conditionType: this.state.subtype, conditionInput: this.state.input,
-      question: "test", type: "text",
-      subtype: "", subinputs: {}};
+      question: "", type: "text", input: "",
+      subtype: "equals", subinputs: {}};
 
     this.locaStorage = set(this.locaStorage, this.props.path, currentElement);
 
@@ -50,21 +49,41 @@ class SubInput extends React.Component {
     return e => {
       let path = this.props.path.split(".subinputs.");
       let currentElement = this.findElement(path);
-      currentElement[field] = e.currentTarget.value;
+      let value = e.currentTarget.value;
+      currentElement[field] = value;
+      currentElement = this.updateChildren(field, value, currentElement);
 
       let p1 = new Promise((resolve, reject) => {
-        resolve(this.localStorage = set(this.localStorage, this.props.path, currentElement));
+        resolve(this.localStorage =
+          set(this.localStorage, this.props.path, currentElement));
       });
 
       let p2 = new Promise((resolve, reject) => {
-        resolve(localStorage.setItem('formInputs', JSON.stringify(this.localStorage)));
+        resolve(localStorage.setItem('formInputs',
+          JSON.stringify(this.localStorage)));
       });
 
-      let target = e.currentTarget.value;
       p1.then(() => p2.then(() => {
-        this.setState({[field]: target});
+        this.setState({[field]: value});
       }));
     };
+  }
+
+  updateChildren(field, value, element) {
+    let childParam;
+    if (field === 'input') {
+      childParam = 'conditionInput';
+    } else if (field === 'subtype') {
+      childParam = 'conditionType';
+    } else {
+      return element;
+    }
+    let keys = Object.keys(element.subinputs);
+
+    for (let i = 0; i < keys.length; i++) {
+      element.subinputs[keys[i]][childParam] = value;
+    }
+    return element;
   }
 
   deleteSelf(subinput) {

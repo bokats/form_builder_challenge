@@ -21,7 +21,7 @@ class Input extends React.Component {
 
     this.localStorage[this.props.input].subinputs[subInputNumber] =
     {conditionType: this.state.subtype, conditionInput: this.state.input,
-      question: "", type: "text", subtype: "", subinputs: {}};
+      question: "", type: "text", subtype: "equals", subinputs: {}};
     let newState = JSON.stringify(this.localStorage);
 
     let p = new Promise((resolve, reject) => {
@@ -55,8 +55,8 @@ class Input extends React.Component {
       let value = e.currentTarget.value;
 
       let p1 = new Promise((resolve, reject) => {
-        resolve(localStorage.setItem('formInputs', newState));
-        this.updateChildren(field, value);
+        resolve(localStorage.setItem('formInputs', newState),
+        this.updateChildren(field, value));
       });
 
       let p2 = new Promise((resolve, reject) => {
