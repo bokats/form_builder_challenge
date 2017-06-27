@@ -9,6 +9,7 @@ class Input extends React.Component {
       subinputs: props.data.subinputs};
     this.update = this.update.bind(this);
     this.addSubInput = this.addSubInput.bind(this);
+    this.deleteInput = this.deleteInput.bind(this);
     this.localStorage = JSON.parse(localStorage.getItem('formInputs'));
     this.parentState = this;
   }
@@ -24,7 +25,8 @@ class Input extends React.Component {
       subInputNumber = 1;
     }
     this.localStorage[this.props.input].subinputs[subInputNumber] =
-    {condition: "", question: "", type: "text", subtype: ""};
+    {conditionType: this.state.subtype, conditionInput: this.state.input,
+      question: "", type: "text", subtype: "", subinputs: {}};
     localStorage.setItem('formInputs', JSON.stringify(this.localStorage));
     this.setState({['subinputs']: this.localStorage[this.props.input].
       subinputs});
@@ -35,6 +37,23 @@ class Input extends React.Component {
       this.localStorage[this.props.input][field] = e.currentTarget.value;
       localStorage.setItem('formInputs', JSON.stringify(this.localStorage));
       this.setState({[field]: e.currentTarget.value});
+      if (field === 'type' && e.currentTarget.value !== 'number' &&
+        this.state.subtype !== 'equals') {
+          this.updateSubType();
+        }
+      console.log(localStorage);
+    };
+  }
+
+  updateSubType() {
+    this.localStorage[this.props.input]['subtype'] = 'equals';
+    localStorage.setItem('formInputs', JSON.stringify(this.localStorage));
+    this.setState({['subtype']: 'equals'});
+  }
+
+  deleteInput(input) {
+    return e => {
+      this.props.parentState.deleteInput(input);
     };
   }
 
@@ -43,7 +62,7 @@ class Input extends React.Component {
     if (this.state.type === "number") {
       subtype = (
         <label>Number type
-          <select onChange={this.update('subtype')}>
+          <select value={this.state.subtype} onChange={this.update('subtype')}>
             <option value="greater-than">Greater than</option>
             <option value="equals">Equals</option>
             <option value="less-than">Less than</option>
@@ -52,8 +71,16 @@ class Input extends React.Component {
       );
     }
 
-    let subinputs = Object.keys(this.state.subinputs);
-
+    let subinputsKeys = Object.keys(this.state.subinputs);
+    let subinputs = (
+      subinputsKeys.map(subinput => {
+        let path = `${this.props.input}.subinputs.${subinput}`;
+        return (
+          <SubInput key={subinput} data={this.state.subinputs[subinput]}
+            subinput={subinput} parentState={this.parentState}
+            parentInfo={this.state} path={path}/> );
+          })
+    );
     return (
       <div className="input-container">
         <label>Question
@@ -71,18 +98,14 @@ class Input extends React.Component {
         {subtype}
         <label>Input
           <input type='text' placeholder='Type your input answer'
-            value={this.state.answer}
-            onChange={this.update('answer')}/>
+            value={this.state.input}
+            onChange={this.update('input')}/>
         </label>
         <button onClick={this.addSubInput}>Add Sub-Input</button>
-        <button onClick={this.props.parentState.deleteInput(this.props.input)}>
+        <button onClick={this.deleteInput(this.props.input)}>
           Delete Input</button>
         <div>
-          {subinputs.map(subinput => {
-            return (
-              <SubInput key={subinput} data={this.state.subinputs[`${subinput}`]}
-                subinput={subinput} parentState={this.parentState}/>);
-              })}
+          {subinputs}
         </div>
       </div>
     );

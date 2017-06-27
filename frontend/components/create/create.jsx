@@ -20,18 +20,16 @@ class Create extends React.Component {
     e.preventDefault();
     let currentInputs = this.state.formState;
     currentInputs[`input${Object.keys(currentInputs).length + 1}`] =
-    {question: "", type: "text", subtype: "", input: "", subinputs: {}};
+    {question: "", type: "text", subtype: "equals", input: "", subinputs: {}};
     localStorage.setItem('formInputs', JSON.stringify(currentInputs));
     this.setState({['formState']: currentInputs});
   }
 
   deleteInput(input) {
-    return e => {
-      let currentInputs = this.state.formState;
-      delete currentInputs[input];
-      localStorage.setItem('formInputs', JSON.stringify(currentInputs));
-      this.setState({['formState']: currentInputs});
-    };
+    let currentInputs = this.state.formState;
+    delete currentInputs[input];
+    localStorage.setItem('formInputs', JSON.stringify(currentInputs));
+    this.setState({['formState']: currentInputs});
   }
 
   render() {
