@@ -14,10 +14,16 @@ class SubInput extends React.Component {
       this.addSubInput = this.addSubInput.bind(this);
       this.localStorage = JSON.parse(localStorage.getItem('formInputs'));
       this.parentState = this;
+      console.log(props.parentInfo.input, 'subinput');
   }
 
   addSubInput(e) {
 
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.setState({['conditionType']: nextProps.parentInfo.subtype,
+      ['conditionInput']: nextProps.parentInfo.input});
   }
 
   updateInput(field) {

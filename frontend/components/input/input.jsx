@@ -27,6 +27,7 @@ class Input extends React.Component {
     this.localStorage[this.props.input].subinputs[subInputNumber] =
     {conditionType: this.state.subtype, conditionInput: this.state.input,
       question: "", type: "text", subtype: "", subinputs: {}};
+
     localStorage.setItem('formInputs', JSON.stringify(this.localStorage));
     this.setState({['subinputs']: this.localStorage[this.props.input].
       subinputs});
@@ -35,13 +36,15 @@ class Input extends React.Component {
   update(field) {
     return e => {
       this.localStorage[this.props.input][field] = e.currentTarget.value;
-      localStorage.setItem('formInputs', JSON.stringify(this.localStorage));
+      let newState = JSON.stringify(this.localStorage);
+      setInterval(function(){
+        localStorage.setItem('formInputs', newState);
+      }, 500);
       this.setState({[field]: e.currentTarget.value});
       if (field === 'type' && e.currentTarget.value !== 'number' &&
         this.state.subtype !== 'equals') {
           this.updateSubType();
         }
-      console.log(localStorage);
     };
   }
 
@@ -58,6 +61,7 @@ class Input extends React.Component {
   }
 
   render() {
+    console.log(this.state);
     let subtype;
     if (this.state.type === "number") {
       subtype = (
