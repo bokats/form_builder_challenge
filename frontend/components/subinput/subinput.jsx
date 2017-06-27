@@ -8,17 +8,37 @@ class SubInput extends React.Component {
       conditionInput: props.parentInfo.input,
       question: props.data.question, type: props.data.type,
       subtype: props.data.subtype, input: props.data.input,
-      subinputs: props.data.subinputs};
+      subinputs: undefined ? {} : props.data.subinputs};
       this.updateInput = this.updateInput.bind(this);
       this.updateConditional = this.updateConditional.bind(this);
       this.addSubInput = this.addSubInput.bind(this);
       this.localStorage = JSON.parse(localStorage.getItem('formInputs'));
       this.parentState = this;
-      console.log(props.parentInfo.input, 'subinput');
+      this.deleteChild = this.deleteChild.bind(this);
   }
 
   addSubInput(e) {
+    e.preventDefault();
+    let subInputNumber = this.findNextNumber(Object.keys(this.state.subinputs));
+    let path = this.props.path.split(".subinputs.");
+    let currentElement = this.findElement(path);
+    console.log(currentElement);
+    currentElement.subinputs[subInputNumber] = {
+      conditionType: this.state.subtype, conditionInput: this.state.input,
+      question: "test", type: "text",
+      subtype: "", subinputs: {}};
 
+    this.locaStorage = set(this.locaStorage, this.props.path, currentElement);
+
+    let newState = JSON.stringify(this.localStorage);
+
+    let p = new Promise((resolve, reject) => {
+      resolve(localStorage.setItem('formInputs', newState));
+    });
+
+    p.then(() => {
+      this.setState({['subinputs']: currentElement.subinputs});
+    });
   }
 
   componentWillReceiveProps(nextProps) {
@@ -35,6 +55,30 @@ class SubInput extends React.Component {
       localStorage.setItem('formInputs', JSON.stringify(this.localStorage));
       this.setState({[field]: e.currentTarget.value});
     };
+  }
+
+  deleteSelf(subinput) {
+    return e => {
+      this.props.parentState.deleteChild(subinput);
+    };
+  }
+
+  deleteChild(subinput) {
+    let path = this.props.path.split(".subinputs.");
+    let currentElement = this.findElement(path);
+    delete currentElement.subinputs[subinput];
+    let p1 = new Promise((resolve, reject) => {
+      resolve();
+    });
+    this.localStorage = set(this.localStorage, this.props.path, currentElement);
+
+    let p2 = new Promise((resolve, reject) => {
+      resolve(localStorage.setItem('formInputs', JSON.stringify(this.localStorage)));
+    });
+
+    p1.then(() => p2.then(() =>
+      this.setState({['subinputs']: currentElement.subinputs})));
+
   }
 
   updateConditional(field) {
@@ -61,6 +105,20 @@ class SubInput extends React.Component {
       }
     }
     return currentElement;
+  }
+
+  findNextNumber(array) {
+    if (array.length < 1) {
+      return 1;
+    }
+    let max = Infinity * -1;
+    for (let i = 0; i < array.length; i++) {
+      let num = parseInt(array[i]);
+      if (num > max) {
+        max = num;
+      }
+    }
+    return max + 1;
   }
 
   render() {
@@ -95,8 +153,20 @@ class SubInput extends React.Component {
         </label>
       );
     }
+    let subinputsKeys = [];
+    if (this.state.subinputs) {
+      subinputsKeys = Object.keys(this.state.subinputs);
+    }
 
-    let subinputs = Object.keys(this.state.subinputs);
+    let subinputs = (
+      subinputsKeys.map(subinput => {
+        let path = `${this.props.path}.subinputs.${subinput}`;
+        return (
+          <SubInput key={subinput} data={this.state.subinputs[subinput]}
+            subinput={subinput} parentState={this.parentState}
+            parentInfo={this.state} path={path}/> );
+          })
+    );
 
     return (
       <div className="sub-input-container">
@@ -128,14 +198,10 @@ class SubInput extends React.Component {
             onChange={this.updateInput('answer')}/>
         </label>
         <button onClick={this.addSubInput}>Add Sub-Input</button>
-        <button onClick={this.props.parentState.deleteInput(this.props.input)}>
-          Delete Input</button>
+        <button onClick={this.deleteSelf(this.props.subinput)}>
+          Delete Sub-Input</button>
         <div>
-          {subinputs.map(subinput => {
-            return (
-              <SubInput key={subinput} data={this.state.subinputs[`${subinput}`]}
-                subinput={subinput} parentState={this.parentState}/>);
-              })}
+          {subinputs}
         </div>
       </div>
     );

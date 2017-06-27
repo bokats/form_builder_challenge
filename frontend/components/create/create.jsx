@@ -19,17 +19,43 @@ class Create extends React.Component {
   createInput(e) {
     e.preventDefault();
     let currentInputs = this.state.formState;
-    currentInputs[`input${Object.keys(currentInputs).length + 1}`] =
-    {question: "", type: "text", subtype: "equals", input: "", subinputs: {}};
-    localStorage.setItem('formInputs', JSON.stringify(currentInputs));
-    this.setState({['formState']: currentInputs});
+
+    let p1 = new Promise((resolve, reject) => {
+      let newInputNumber = this.findNextNumber(Object.keys(currentInputs));
+      resolve(currentInputs[`${newInputNumber}`] =
+      {question: "", type: "text", subtype: "equals", input: "", subinputs: {}});
+    });
+
+    let p2 = new Promise((resolve, reject) => {
+      resolve(localStorage.setItem('formInputs', JSON.stringify(currentInputs)));
+    });
+
+    p1.then(() => p2.then(() => this.setState({['formState']: currentInputs})));
+  }
+
+  findNextNumber(array) {
+    if (array.length < 1) {
+      return 1;
+    }
+    let max = Infinity * -1;
+    for (let i = 0; i < array.length; i++) {
+      let num = parseInt(array[i]);
+      if (num > max) {
+        max = num;
+      }
+    }
+    return max + 1;
   }
 
   deleteInput(input) {
     let currentInputs = this.state.formState;
     delete currentInputs[input];
-    localStorage.setItem('formInputs', JSON.stringify(currentInputs));
-    this.setState({['formState']: currentInputs});
+
+    let p1 = new Promise((resolve, reject) => {
+      resolve(localStorage.setItem('formInputs', JSON.stringify(currentInputs)));
+    });
+
+    p1.then(() => this.setState({['formState']: currentInputs}));
   }
 
   render() {
