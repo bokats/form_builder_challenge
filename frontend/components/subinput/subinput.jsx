@@ -47,9 +47,16 @@ class SubInput extends React.Component {
 
   updateInput(field) {
     return e => {
+      console.log(field, 'sub');
       let path = this.props.path.split(".subinputs.");
       let currentElement = this.findElement(path);
-      let value = e.currentTarget.value;
+      let value;
+      if (typeof e === 'string') {
+        value = e;
+      } else {
+        value = e.currentTarget.value;
+      }
+
       currentElement[field] = value;
       currentElement = this.updateChildren(field, value, currentElement);
 
@@ -110,18 +117,35 @@ class SubInput extends React.Component {
   }
 
   updateConditional(field) {
-    let parentType;
-    if (field === 'conditionType') {
-      parentType = 'subtype';
-    } else {
-      parentType = 'input';
-    }
     return e => {
-      let p1 = new Promise((resolve, reject) => {
-        this.props.parentState.updateInput(parentType)(e);
-      });
+      let parentType;
+      let value;
+      if (field === 'conditionType') {
+        parentType = 'subtype';
+      } else {
+        parentType = 'input';
+      }
 
-      p1.then(() => this.updateInput(field)(e));
+      if (typeof e === 'string') {
+        value = e;
+      } else {
+        value = e.currentTarget.value;
+      }
+
+      this.props.parentState.updateInput(parentType)(value);
+
+      // let p1 = new Promise((resolve, reject) => {
+      //   resolve();
+      // });
+
+      // p1.then(() => {
+      //   console.log(localStorage);
+      //   this.updateInput(field)(value);
+      // });
+
+      if (field === 'conditionType' && value !== 'yes/no') {
+        this.updateConditional('conditionInput')('');
+      }
     };
 
   }
@@ -155,7 +179,11 @@ class SubInput extends React.Component {
   render() {
 
     let conditionInput;
-    if (this.state.conditionType === 'yes/no') {
+    let subtype;
+    let input;
+
+    if (this.state.conditionInput === 'yes' ||
+      this.state.conditionInput === 'no') {
       conditionInput = (
         <select value={this.state.conditionInput}
           onChange={this.updateConditional('conditionInput')}>
@@ -171,7 +199,6 @@ class SubInput extends React.Component {
       );
     }
 
-    let subtype;
     if (this.state.type === "number") {
       subtype = (
         <label>Number type
@@ -199,6 +226,21 @@ class SubInput extends React.Component {
           })
     );
 
+    if (this.state.type === 'yes/no') {
+      input = (
+        <select value={this.state.input} onChange={this.updateInput('input')}>
+          <option value='yes'>Yes</option>
+          <option value='no'>No</option>
+        </select>
+      );
+    } else {
+      input = (
+        <input type='text' placeholder='Type your input answer'
+          value={this.state.input}
+          onChange={this.updateInput('input')}/>
+      );
+    }
+
     return (
       <div className="sub-input-container">
         <label>Condition
@@ -224,9 +266,7 @@ class SubInput extends React.Component {
         </label>
         {subtype}
         <label>Input
-          <input type='text' placeholder='Type your input answer'
-            value={this.state.input}
-            onChange={this.updateInput('input')}/>
+          {input}
         </label>
         <button onClick={this.addSubInput}>Add Sub-Input</button>
         <button onClick={this.deleteSelf(this.props.subinput)}>

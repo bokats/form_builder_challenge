@@ -50,22 +50,39 @@ class Input extends React.Component {
 
   updateInput(field) {
     return e => {
-      this.localStorage[this.props.input][field] = e.currentTarget.value;
-      let newState = JSON.stringify(this.localStorage);
-      let value = e.currentTarget.value;
+      let value;
+      let newState;
+      if (typeof e  === "string") {
+        value = e;
+      } else {
+        value = e.currentTarget.value;
+      }
+      this.localStorage[this.props.input][field] = value;
+      this.updateChildren(field, value);
 
       let p1 = new Promise((resolve, reject) => {
-        resolve(localStorage.setItem('formInputs', newState),
-        this.updateChildren(field, value));
+        resolve(newState = JSON.stringify(this.localStorage));
       });
 
       let p2 = new Promise((resolve, reject) => {
+        resolve(localStorage.setItem('formInputs', newState));
+      });
+
+      let p3 = new Promise((resolve, reject) => {
         resolve(this.setState({[field]: value}));
       });
 
-      p1.then(() => p2.then(() => {
+      p1.then(() => p2.then(() => p3.then(() => {
         this.updateSubType(field, value);
-      }));
+      })));
+
+      if (field === 'type' && value === 'yes/no') {
+        this.updateInput('input')('yes');
+      } else if (field === 'type') {
+        this.updateInput('input')('');
+      } else if (field === 'subtype') {
+        this.updateInput('type')('number');
+      }
     };
   }
 
@@ -120,9 +137,11 @@ class Input extends React.Component {
 
   render() {
     let subtype;
+    let input;
+
     if (this.state.type === "number") {
       subtype = (
-        <label>Number type
+        <label>Input
           <select value={this.state.subtype} onChange={this.updateInput('subtype')}>
             <option value="greater-than">Greater than</option>
             <option value="equals">Equals</option>
@@ -131,6 +150,22 @@ class Input extends React.Component {
         </label>
       );
     }
+
+    if (this.state.type === 'yes/no') {
+      input = (
+        <select value={this.state.input} onChange={this.updateInput('input')}>
+          <option value='yes'>Yes</option>
+          <option value='no'>No</option>
+        </select>
+      );
+    } else {
+      input = (
+        <input type='text' placeholder='Type your input answer'
+          value={this.state.input}
+          onChange={this.updateInput('input')}/>
+      );
+    }
+
     let subinputsKeys = [];
     if (this.state.subinputs) {
       subinputsKeys = Object.keys(this.state.subinputs);
@@ -160,9 +195,7 @@ class Input extends React.Component {
         </label>
         {subtype}
         <label>Input
-          <input type='text' placeholder='Type your input answer'
-            value={this.state.input}
-            onChange={this.updateInput('input')}/>
+          {input}
         </label>
         <button onClick={this.addSubInput}>Add Sub-Input</button>
         <button onClick={this.deleteSelf(this.props.input)}>
