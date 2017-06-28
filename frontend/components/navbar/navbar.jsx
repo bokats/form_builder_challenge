@@ -15,7 +15,7 @@ class NavBar extends React.Component {
   render() {
     return(
       <nav className='navbar-container'>
-        <div className='navbar-button' onClick={this.changePath('create')}>
+        <div className='navbar-button selected' onClick={this.changePath('create')}>
           Create</div>
         <div className='navbar-button' onClick={this.changePath('preview')}>
           Preview</div>
