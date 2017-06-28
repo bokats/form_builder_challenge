@@ -144,8 +144,9 @@ class Input extends React.Component {
 
     if (this.state.type === "number") {
       subtype = (
-        <label>Input
-          <select value={this.state.subtype} onChange={this.updateInput('subtype')}>
+        <label className='secondary-section'>Sub-Type
+          <select value={this.state.subtype} onChange={this.updateInput('subtype')}
+            className='dropdown-box subtype'>
             <option value="greater-than">Greater than</option>
             <option value="equals">Equals</option>
             <option value="less-than">Less than</option>
@@ -156,15 +157,16 @@ class Input extends React.Component {
 
     if (this.state.type === 'yes/no') {
       input = (
-        <select value={this.state.input} onChange={this.updateInput('input')}>
+        <select value={this.state.input} onChange={this.updateInput('input')}
+          className='dropdown-box input'>
           <option value='yes'>Yes</option>
           <option value='no'>No</option>
         </select>
       );
     } else {
       input = (
-        <input type='text' placeholder='Type your input answer'
-          value={this.state.input}
+        <input type='text' value={this.state.input}
+          className='input-box input'
           onChange={this.updateInput('input')}/>
       );
     }
@@ -183,29 +185,34 @@ class Input extends React.Component {
           })
     );
     return (
-      <div className="input-container">
-        <label>Question
-          <input type='text' placeholder='Type your input question'
-            value={this.state.question}
-            onChange={this.updateInput('question')}/>
-        </label>
-        <label>Type
-          <select value={this.state.type} onChange={this.updateInput('type')}>
-            <option value="text">Text</option>
-            <option value="number">Number</option>
-            <option value="yes/no">Yes/No</option>
-          </select>
-        </label>
-        {subtype}
-        <label>Input
-          {input}
-        </label>
-        <button onClick={this.addSubInput}>Add Sub-Input</button>
-        <button onClick={this.deleteSelf(this.props.input)}>
-          Delete Input</button>
-        <div>
-          {subinputs}
+      <div className='parent-input-container'>
+        <div className="input-container">
+          <label className='first-section'>Question
+            <input type='text'
+              value={this.state.question} className='input-box question'
+              onChange={this.updateInput('question')}/>
+          </label>
+          <label className='secondary-section'>Type
+            <select value={this.state.type} onChange={this.updateInput('type')}
+              className='dropdown-box type'>
+              <option value="text">Text</option>
+              <option value="number">Number</option>
+              <option value="yes/no">Yes/No</option>
+            </select>
+          </label>
+          {subtype}
+          <label className='secondary-section'>Input
+            {input}
+          </label>
+          <div className='buttons-container'>
+            <button className='input-box-button' onClick={this.addSubInput}>
+              Add Sub-Input</button>
+            <button className='input-box-button'
+              onClick={this.deleteSelf(this.props.input)}>
+              Delete</button>
+          </div>
         </div>
+        {subinputs}
       </div>
     );
   }

@@ -195,24 +195,27 @@ class SubInput extends React.Component {
       this.state.conditionInput === 'no') {
       conditionInput = (
         <select value={this.state.conditionInput}
-          onChange={this.updateConditional('conditionInput')}>
+          onChange={this.updateConditional('conditionInput')}
+          className='dropdown-box condition-input'>
           <option value="yes">Yes</option>
           <option value="no">No</option>
         </select>
       );
     } else {
       conditionInput = (
-        <input type='text' placeholder='Type your input answer'
+        <input type='text'
           value={this.state.conditionInput}
+          className='input-box condition-input'
           onChange={this.updateConditional('conditionInput')}/>
       );
     }
 
     if (this.state.type === "number") {
       subtype = (
-        <label>Number type
+        <label className='secondary-section'>Sub-Type
           <select value={this.state.subtype}
-            onChange={this.updateInput('subtype')}>
+            onChange={this.updateInput('subtype')}
+            className='dropdown-box subtype'>
             <option value="greater-than">Greater than</option>
             <option value="equals">Equals</option>
             <option value="less-than">Less than</option>
@@ -237,52 +240,62 @@ class SubInput extends React.Component {
 
     if (this.state.type === 'yes/no') {
       input = (
-        <select value={this.state.input} onChange={this.updateInput('input')}>
+        <select value={this.state.input} onChange={this.updateInput('input')}
+          className='input-box input'>
           <option value='yes'>Yes</option>
           <option value='no'>No</option>
         </select>
       );
     } else {
       input = (
-        <input type='text' placeholder='Type your input answer'
-          value={this.state.input}
+        <input type='text'
+          value={this.state.input} className='input-box input'
           onChange={this.updateInput('input')}/>
       );
     }
 
+    let margin = (this.props.path.split('.subinputs').length) * 25;
+    let style = {marginLeft: `${margin}`};
+
     return (
-      <div className="sub-input-container">
-        <label>Condition
-          <select value={this.state.conditionType}
-            onChange={this.updateConditional('conditionType')}>
-            <option value="equals">Equals</option>
-            <option value="greater-than">Greater than</option>
-            <option value="less-than">Less than</option>
-          </select>
-          {conditionInput}
-        </label>
-        <label>Question
-          <input type='text' placeholder='Type your input question'
-            value={this.state.question}
-            onChange={this.updateInput('question')}/>
-        </label>
-        <label>Type
-          <select value={this.state.type} onChange={this.updateInput('type')}>
-            <option value="text">Text</option>
-            <option value="number">Number</option>
-            <option value="yes/no">Yes/No</option>
-          </select>
-        </label>
-        {subtype}
-        <label>Input
-          {input}
-        </label>
-        <button onClick={this.addSubInput}>Add Sub-Input</button>
-        <button onClick={this.deleteSelf(this.props.subinput)}>
-          Delete Sub-Input</button>
-        <div>
-          {subinputs}
+      <div className='parent-subinput-container'>
+        <div className="input-container" style={style}>
+          <label className='first-section'>Condition
+            <select value={this.state.conditionType}
+              className='dropdown-box condition-type'
+              onChange={this.updateConditional('conditionType')}>
+              <option value="equals">Equals</option>
+              <option value="greater-than">Greater than</option>
+              <option value="less-than">Less than</option>
+            </select>
+            {conditionInput}
+          </label>
+          <label className='secondary-section'>Question
+            <input type='text'
+              value={this.state.question} className='input-box question'
+              onChange={this.updateInput('question')}/>
+          </label>
+          <label className='secondary-section'>Type
+            <select value={this.state.type} onChange={this.updateInput('type')}
+              className='dropdown-box type'>
+              <option value="text">Text</option>
+              <option value="number">Number</option>
+              <option value="yes/no">Yes/No</option>
+            </select>
+          </label>
+          {subtype}
+          <label className='secondary-section'>Input
+            {input}
+          </label>
+          <div className='buttons-container'>
+            <button className='input-box-button'
+              onClick={this.addSubInput}>Add Sub-Input</button>
+            <button className='input-box-button'
+              onClick={this.deleteSelf(this.props.subinput)}>
+              Delete</button>
+          </div>
         </div>
+        {subinputs}
       </div>
     );
   }

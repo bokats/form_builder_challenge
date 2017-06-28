@@ -6,9 +6,19 @@ class NavBar extends React.Component {
     super(props);
   }
 
+  changeClasses(element) {
+    let selectedElement = document.getElementsByClassName('selected')[0];
+    if (element === selectedElement) {
+      return;
+    }
+    element.classList.add('selected');
+    selectedElement.classList.remove('selected');
+  }
+
   changePath(location) {
     return e => {
       hashHistory.push(`/${location}`);
+      this.changeClasses(e.currentTarget);
     };
   }
 
