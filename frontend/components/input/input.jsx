@@ -11,7 +11,6 @@ class Input extends React.Component {
     this.addSubInput = this.addSubInput.bind(this);
     this.deleteSelf = this.deleteSelf.bind(this);
     this.deleteChild = this.deleteChild.bind(this);
-    this.localStorage = JSON.parse(localStorage.getItem('formInputs'));
     this.parentState = this;
   }
 
@@ -19,17 +18,18 @@ class Input extends React.Component {
     e.preventDefault();
     let subInputNumber = this.findNextNumber(Object.keys(this.state.subinputs));
 
-    this.localStorage[this.props.input].subinputs[subInputNumber] =
+    let newState = JSON.parse(localStorage.getItem('formInputs'));
+
+    newState[this.props.input].subinputs[subInputNumber] =
     {conditionType: this.state.subtype, conditionInput: this.state.input,
-      question: "", type: "text", subtype: "equals", subinputs: {}};
-    let newState = JSON.stringify(this.localStorage);
+      question: "", type: "text", input: "", subtype: "equals", subinputs: {}};
 
     let p = new Promise((resolve, reject) => {
-      resolve(localStorage.setItem('formInputs', newState));
+      resolve(localStorage.setItem('formInputs', JSON.stringify(newState)));
     });
 
     p.then(() => {
-      this.setState({['subinputs']: this.localStorage[this.props.input].
+      this.setState({['subinputs']: newState[this.props.input].
       subinputs});
     });
   }
@@ -57,24 +57,23 @@ class Input extends React.Component {
       } else {
         value = e.currentTarget.value;
       }
-      this.localStorage[this.props.input][field] = value;
-      this.updateChildren(field, value);
+
+      newState = JSON.parse(localStorage.getItem('formInputs'));
+      this.updateChildren(newState, field, value);
+
+      newState[this.props.input][`${field}`] = value;
 
       let p1 = new Promise((resolve, reject) => {
-        resolve(newState = JSON.stringify(this.localStorage));
+        resolve(localStorage.setItem('formInputs', JSON.stringify(newState)));
       });
 
       let p2 = new Promise((resolve, reject) => {
-        resolve(localStorage.setItem('formInputs', newState));
-      });
-
-      let p3 = new Promise((resolve, reject) => {
         resolve(this.setState({[field]: value}));
       });
 
-      p1.then(() => p2.then(() => p3.then(() => {
+      p1.then(() => p2.then(() => {
         this.updateSubType(field, value);
-      })));
+      }));
 
       if (field === 'type' && value === 'yes/no') {
         this.updateInput('input')('yes');
@@ -89,30 +88,34 @@ class Input extends React.Component {
   updateSubType(field, value) {
     if (field === 'type' && value !== 'number' &&
     this.state.subtype !== 'equals') {
-      this.localStorage[this.props.input]['subtype'] = 'equals';
+      let newState = JSON.parse(localStorage.getItem('formInputs'));
+      newState[this.props.input]['subtype'] = 'equals';
       let p1 = new Promise((resolve, reject) => {
-        resolve(localStorage.setItem('formInputs', JSON.stringify(this.localStorage)));
+        resolve(localStorage.setItem('formInputs', JSON.stringify(newState)));
       });
       p1.then(() => this.setState({['subtype']: 'equals'}));
     }
   }
 
-  updateChildren(field, value) {
+  updateChildren(state, field, value) {
     let childParam;
     if (field === 'input') {
       childParam = 'conditionInput';
     } else if (field === 'subtype') {
       childParam = 'conditionType';
+    } else if (field === 'type' && value === 'text') {
+      value = 'equals';
+      childParam = 'conditionType';
     } else {
       return;
     }
-    let keys = Object.keys(this.localStorage[this.props.input].subinputs);
+
+    let keys = Object.keys(state[this.props.input].subinputs);
 
     for (let i = 0; i < keys.length; i++) {
-      this.localStorage[this.props.input].subinputs[keys[i]][childParam]
+      state[this.props.input].subinputs[keys[i]][childParam]
       = value;
     }
-    localStorage.setItem('formInputs', JSON.stringify(this.localStorage));
   }
 
   deleteSelf(input) {
@@ -122,16 +125,16 @@ class Input extends React.Component {
   }
 
   deleteChild(subinput) {
-    delete this.localStorage[`${this.props.input}`].subinputs[subinput];
-    let newState = JSON.stringify(this.localStorage);
+    let newState = JSON.parse(localStorage.getItem('formInputs'));
+    delete newState[`${this.props.input}`].subinputs[subinput];
 
     let p = new Promise((resolve, reject) => {
-      resolve(localStorage.setItem('formInputs', newState));
+      resolve(localStorage.setItem('formInputs', JSON.stringify(newState)));
     });
 
     p.then(() => {
       this.setState({['subinputs']:
-        this.localStorage[`${this.props.input}`].subinputs});
+        newState[`${this.props.input}`].subinputs});
     });
   }
 

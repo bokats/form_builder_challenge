@@ -12,7 +12,6 @@ class SubInput extends React.Component {
       this.updateInput = this.updateInput.bind(this);
       this.updateConditional = this.updateConditional.bind(this);
       this.addSubInput = this.addSubInput.bind(this);
-      this.localStorage = JSON.parse(localStorage.getItem('formInputs'));
       this.parentState = this;
       this.deleteChild = this.deleteChild.bind(this);
   }
@@ -27,9 +26,9 @@ class SubInput extends React.Component {
       question: "", type: "text", input: "",
       subtype: "equals", subinputs: {}};
 
-    this.locaStorage = set(this.locaStorage, this.props.path, currentElement);
-
-    let newState = JSON.stringify(this.localStorage);
+    let newState = JSON.parse(localStorage.getItem('formInputs'));
+    newState = set(newState, this.props.path, currentElement);
+    newState = JSON.stringify(newState);
 
     let p = new Promise((resolve, reject) => {
       resolve(localStorage.setItem('formInputs', newState));
@@ -47,7 +46,6 @@ class SubInput extends React.Component {
 
   updateInput(field) {
     return e => {
-      console.log(field, 'sub');
       let path = this.props.path.split(".subinputs.");
       let currentElement = this.findElement(path);
       let value;
@@ -58,21 +56,34 @@ class SubInput extends React.Component {
       }
 
       currentElement[field] = value;
-      currentElement = this.updateChildren(field, value, currentElement);
+      this.updateChildren(field, value, currentElement);
+      let newState = JSON.parse(localStorage.getItem('formInputs'));
 
       let p1 = new Promise((resolve, reject) => {
-        resolve(this.localStorage =
-          set(this.localStorage, this.props.path, currentElement));
+        resolve(newState =
+          set(newState, this.props.path, currentElement));
       });
 
       let p2 = new Promise((resolve, reject) => {
         resolve(localStorage.setItem('formInputs',
-          JSON.stringify(this.localStorage)));
+          JSON.stringify(newState)));
       });
 
       p1.then(() => p2.then(() => {
         this.setState({[field]: value});
       }));
+
+      if (field === 'type' && value === 'yes/no') {
+        this.updateInput('input')('yes');
+      } else if (field === 'type') {
+        this.updateInput('input')('');
+      } else if (field === 'subtype') {
+        this.updateInput('type')('number');
+      }
+      if (field === 'type' && value !== 'number' &&
+        this.state.subtype !== 'equals') {
+          this.updateInput('subtype')('equals');
+        }
     };
   }
 
@@ -82,8 +93,11 @@ class SubInput extends React.Component {
       childParam = 'conditionInput';
     } else if (field === 'subtype') {
       childParam = 'conditionType';
+    } else if (field === 'type' && value === 'text') {
+      value = 'equals';
+      childParam = 'conditionType';
     } else {
-      return element;
+      return;
     }
     let keys = Object.keys(element.subinputs);
 
@@ -103,13 +117,16 @@ class SubInput extends React.Component {
     let path = this.props.path.split(".subinputs.");
     let currentElement = this.findElement(path);
     delete currentElement.subinputs[subinput];
+    let newState = localStorage.getItem('formInputs');
+    newState = JSON.parseInt(newState);
+
     let p1 = new Promise((resolve, reject) => {
-      resolve(this.localStorage =
-        set(this.localStorage, this.props.path, currentElement));
+      resolve(newState =
+        set(newState, this.props.path, currentElement));
     });
 
     let p2 = new Promise((resolve, reject) => {
-      resolve(localStorage.setItem('formInputs', JSON.stringify(this.localStorage)));
+      resolve(localStorage.setItem('formInputs', JSON.stringify(newState)));
     });
 
     p1.then(() => p2.then(() =>
@@ -134,15 +151,6 @@ class SubInput extends React.Component {
 
       this.props.parentState.updateInput(parentType)(value);
 
-      // let p1 = new Promise((resolve, reject) => {
-      //   resolve();
-      // });
-
-      // p1.then(() => {
-      //   console.log(localStorage);
-      //   this.updateInput(field)(value);
-      // });
-
       if (field === 'conditionType' && value !== 'yes/no') {
         this.updateConditional('conditionInput')('');
       }
@@ -151,7 +159,8 @@ class SubInput extends React.Component {
   }
 
   findElement(path) {
-    let currentElement = this.localStorage;
+    let currentElement = JSON.parse(localStorage.getItem('formInputs'));
+
     for (let i = 0; i < path.length; i++) {
       if (i === path.length - 1) {
         currentElement = currentElement[path[i]];
