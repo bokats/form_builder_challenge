@@ -1,6 +1,6 @@
 import React from 'react';
 import { hashHistory } from 'react-router';
-import Input from '../input/input';
+import RootInput from '../root_input/root_input';
 
 class Create extends React.Component {
   constructor(props) {
@@ -64,7 +64,7 @@ class Create extends React.Component {
       <div className='create-container'>
         {inputs.map(input => {
           return (
-          <Input key={input} data={this.state.formState[`${input}`]}
+          <RootInput key={input} data={this.state.formState[`${input}`]}
             input={input} parentState={this.parentState}/>);
         })}
         <button className='add-input-button' onClick={this.createInput}>

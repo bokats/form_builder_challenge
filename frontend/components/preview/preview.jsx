@@ -6,7 +6,7 @@ class Preview extends React.Component {
     super(props);
   }
 
-  buildElements() {
+  treeTraversal() {
     let result = [];
     let currentState = JSON.parse(localStorage.getItem('formInputs'));
     let stack = [[currentState, 0]];
@@ -33,9 +33,9 @@ class Preview extends React.Component {
     return result;
   }
 
-  render() {
-    let elementInfo = this.buildElements();
-
+  buildHTMLElement() {
+    let elementInfo = this.treeTraversal();
+    console.log(elementInfo);
     let newElement;
     let css;
 
@@ -43,7 +43,7 @@ class Preview extends React.Component {
       css = {
         marginLeft: `${element.level * 25}px`
       };
-      if (element.input === "") {
+      if (element.input === "" || element.question === "") {
         return;
       }
       if (element.type === 'text') {
@@ -104,10 +104,13 @@ class Preview extends React.Component {
       }
       return newElement;
     });
+    return elements;
+  }
 
+  render() {
     return (
       <div className='preview-container'>
-        {elements}
+        {this.buildHTMLElement()}
       </div>
     );
   }

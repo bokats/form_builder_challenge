@@ -1,7 +1,7 @@
 import React from 'react';
 import SubInput from '../subinput/subinput';
 
-class Input extends React.Component {
+class RootInput extends React.Component {
   constructor(props) {
     super(props);
     this.state = {question: props.data.question,type: props.data.type,
@@ -217,4 +217,4 @@ class Input extends React.Component {
   }
 }
 
-export default Input;
+export default RootInput;
