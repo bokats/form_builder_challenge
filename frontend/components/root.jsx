@@ -2,9 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Router, Route, IndexRoute, hashHistory } from 'react-router';
 import App from './app';
-import Create from './create/create';
-import Preview from './preview/preview';
-import Export from './export/export';
+import Create from './create';
+import Preview from './preview';
+import Export from './export';
 
 const Root = () => {
 

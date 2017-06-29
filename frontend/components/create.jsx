@@ -1,6 +1,6 @@
 import React from 'react';
 import { hashHistory } from 'react-router';
-import RootInput from '../root_input/root_input';
+import RootInput from './root_input';
 
 class Create extends React.Component {
   constructor(props) {

@@ -1,5 +1,5 @@
 import React from 'react';
-import SubInput from '../subinput/subinput';
+import SubInput from './subinput';
 
 class RootInput extends React.Component {
   constructor(props) {
