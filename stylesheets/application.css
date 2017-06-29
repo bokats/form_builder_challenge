@@ -159,3 +159,8 @@ body {
   margin-top: 23px;
   border: 2px solid grey;
 }
+
+.error {
+  text-align: center;
+  color: #F4511E;
+}

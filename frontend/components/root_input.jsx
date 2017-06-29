@@ -6,7 +6,7 @@ class RootInput extends React.Component {
     super(props);
     this.state = {question: props.data.question,type: props.data.type,
       subtype: props.data.subtype, input: props.data.input,
-      subinputs: props.data.subinputs};
+      subinputs: props.data.subinputs, error: ""};
     this.updateInput = this.updateInput.bind(this);
     this.addSubInput = this.addSubInput.bind(this);
     this.deleteSelf = this.deleteSelf.bind(this);
@@ -83,6 +83,12 @@ class RootInput extends React.Component {
       } else if (field === 'subtype') {
         this.updateInput('type')('number');
       }
+      if (!this.validateInput(field, value)) {
+        this.setState({['error']:
+          "Please type in numbers in the input field"});
+      } else if (this.state.error.length > 0) {
+        this.setState({['error']: ""});
+      }
     };
   }
 
@@ -138,10 +144,29 @@ class RootInput extends React.Component {
     });
   }
 
-  render() {
-    let subtype;
-    let input;
+  validateInput(field, value) {
 
+    if (this.state.type === 'number' && parseInt(value) != value
+    && field === 'input') {
+        if (value.length > 0 && value !== 'yes') {
+          return false;
+        } else {
+          return true;
+        }
+    } else if (field === 'type' && value === 'number'
+      && parseInt(this.state.input) != this.state.input) {
+      if (this.state.input.length > 0 && this.state.input !== 'no' &&
+        this.state.input !== 'yes') {
+        return false;
+      } else {
+        return true;
+      }
+    }
+    return true;
+  }
+
+  checkSubtype() {
+    let subtype;
     if (this.state.type === "number") {
       subtype = (
         <label className='secondary-section'>Sub-Type
@@ -154,7 +179,11 @@ class RootInput extends React.Component {
         </label>
       );
     }
+    return subtype;
+  }
 
+  checkInput() {
+    let input;
     if (this.state.type === 'yes/no') {
       input = (
         <select value={this.state.input} onChange={this.updateInput('input')}
@@ -170,6 +199,12 @@ class RootInput extends React.Component {
           onChange={this.updateInput('input')}/>
       );
     }
+    return input;
+  }
+
+  render() {
+    let subtype = this.checkSubtype();
+    let input = this.checkInput();
 
     let subinputsKeys = [];
     if (this.state.subinputs) {
@@ -187,6 +222,7 @@ class RootInput extends React.Component {
     return (
       <div className='parent-input-container'>
         <div className="input-container">
+          <div className='error'>{this.state.error}</div>
           <label className='first-section'>Question
             <input type='text'
               value={this.state.question} className='input-box question'

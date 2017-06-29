@@ -8,7 +8,8 @@ class SubInput extends React.Component {
       conditionInput: props.parentInfo.input,
       question: props.data.question, type: props.data.type,
       subtype: props.data.subtype, input: props.data.input,
-      subinputs: undefined ? {} : props.data.subinputs};
+      subinputs: undefined ? {} : props.data.subinputs,
+      error: ''};
       this.updateInput = this.updateInput.bind(this);
       this.updateConditional = this.updateConditional.bind(this);
       this.addSubInput = this.addSubInput.bind(this);
@@ -84,7 +85,13 @@ class SubInput extends React.Component {
       if (field === 'type' && value !== 'number' &&
         this.state.subtype !== 'equals') {
           this.updateInput('subtype')('equals');
-        }
+      }
+      if (!this.validateInput(field, value)) {
+        this.setState({['error']:
+          "Please type in numbers in the input field"});
+      } else if (this.state.error.length > 0) {
+        this.setState({['error']: ""});
+      }
     };
   }
 
@@ -150,10 +157,6 @@ class SubInput extends React.Component {
       }
 
       this.props.parentState.updateInput(parentType)(value);
-
-      // if (field === 'conditionType' && value !== 'yes/no') {
-      //   this.updateConditional('conditionInput')('');
-      // }
     };
 
   }
@@ -247,6 +250,27 @@ class SubInput extends React.Component {
     return input;
   }
 
+  validateInput(field, value) {
+
+    if (this.state.type === 'number' && parseInt(value) != value
+    && field === 'input') {
+        if (value.length > 0 && value !== 'yes') {
+          return false;
+        } else {
+          return true;
+        }
+    } else if (field === 'type' && value === 'number'
+      && parseInt(this.state.input) != this.state.input) {
+      if (this.state.input.length > 0 && this.state.input !== 'no' &&
+        this.state.input !== 'yes') {
+        return false;
+      } else {
+        return true;
+      }
+    }
+    return true;
+  }
+
   render() {
 
     let conditionInput = this.checkConditionInput();
@@ -274,6 +298,7 @@ class SubInput extends React.Component {
     return (
       <div className='parent-subinput-container'>
         <div className="input-container" style={style}>
+          <div className='error'>{this.state.error}</div>
           <label className='first-section'>Condition
             <select value={this.state.conditionType}
               className='dropdown-box condition-type'
