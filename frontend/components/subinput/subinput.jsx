@@ -75,7 +75,8 @@ class SubInput extends React.Component {
 
       if (field === 'type' && value === 'yes/no') {
         this.updateInput('input')('yes');
-      } else if (field === 'type') {
+      } else if (field === 'type' && (this.state.input === 'yes' ||
+        this.state.input === 'no')) {
         this.updateInput('input')('');
       } else if (field === 'subtype') {
         this.updateInput('type')('number');
@@ -117,8 +118,7 @@ class SubInput extends React.Component {
     let path = this.props.path.split(".subinputs.");
     let currentElement = this.findElement(path);
     delete currentElement.subinputs[subinput];
-    let newState = localStorage.getItem('formInputs');
-    newState = JSON.parseInt(newState);
+    let newState = JSON.parse(localStorage.getItem('formInputs'));
 
     let p1 = new Promise((resolve, reject) => {
       resolve(newState =
@@ -151,9 +151,9 @@ class SubInput extends React.Component {
 
       this.props.parentState.updateInput(parentType)(value);
 
-      if (field === 'conditionType' && value !== 'yes/no') {
-        this.updateConditional('conditionInput')('');
-      }
+      // if (field === 'conditionType' && value !== 'yes/no') {
+      //   this.updateConditional('conditionInput')('');
+      // }
     };
 
   }

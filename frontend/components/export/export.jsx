@@ -14,10 +14,10 @@ class Export extends React.Component {
 
   render() {
     return (
-      <textarea className='json-textarea'>{this.convertToJSON()}</textarea>
+      <textarea className='json-textarea' defaultValue={this.convertToJSON()}>
+      </textarea>
     );
   }
-
 }
 
 export default Export;

@@ -35,7 +35,6 @@ class Preview extends React.Component {
 
   buildHTMLElement() {
     let elementInfo = this.treeTraversal();
-    console.log(elementInfo);
     let newElement;
     let css;
 

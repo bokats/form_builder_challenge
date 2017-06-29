@@ -77,7 +77,8 @@ class RootInput extends React.Component {
 
       if (field === 'type' && value === 'yes/no') {
         this.updateInput('input')('yes');
-      } else if (field === 'type') {
+      } else if (field === 'type' && (this.state.input === 'yes' ||
+        this.state.input === 'no')) {
         this.updateInput('input')('');
       } else if (field === 'subtype') {
         this.updateInput('type')('number');
