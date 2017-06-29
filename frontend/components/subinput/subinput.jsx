@@ -185,11 +185,8 @@ class SubInput extends React.Component {
     return max + 1;
   }
 
-  render() {
-
+  checkConditionInput() {
     let conditionInput;
-    let subtype;
-    let input;
 
     if (this.state.conditionInput === 'yes' ||
       this.state.conditionInput === 'no') {
@@ -209,7 +206,11 @@ class SubInput extends React.Component {
           onChange={this.updateConditional('conditionInput')}/>
       );
     }
+    return conditionInput;
+  }
 
+  checkSubtype() {
+    let subtype;
     if (this.state.type === "number") {
       subtype = (
         <label className='secondary-section'>Sub-Type
@@ -223,21 +224,11 @@ class SubInput extends React.Component {
         </label>
       );
     }
-    let subinputsKeys = [];
-    if (this.state.subinputs) {
-      subinputsKeys = Object.keys(this.state.subinputs);
-    }
+    return subtype;
+  }
 
-    let subinputs = (
-      subinputsKeys.map(subinput => {
-        let path = `${this.props.path}.subinputs.${subinput}`;
-        return (
-          <SubInput key={subinput} data={this.state.subinputs[subinput]}
-            subinput={subinput} parentState={this.parentState}
-            parentInfo={this.state} path={path}/> );
-          })
-    );
-
+  checkInput() {
+    let input;
     if (this.state.type === 'yes/no') {
       input = (
         <select value={this.state.input} onChange={this.updateInput('input')}
@@ -253,6 +244,77 @@ class SubInput extends React.Component {
           onChange={this.updateInput('input')}/>
       );
     }
+    return input;
+  }
+
+  render() {
+
+    let conditionInput = this.checkConditionInput();
+    let subtype = this.checkSubtype();
+    let input = this.checkInput();
+
+    // if (this.state.conditionInput === 'yes' ||
+    //   this.state.conditionInput === 'no') {
+    //   conditionInput = (
+    //     <select value={this.state.conditionInput}
+    //       onChange={this.updateConditional('conditionInput')}
+    //       className='dropdown-box condition-input'>
+    //       <option value="yes">Yes</option>
+    //       <option value="no">No</option>
+    //     </select>
+    //   );
+    // } else {
+    //   conditionInput = (
+    //     <input type='text'
+    //       value={this.state.conditionInput}
+    //       className='input-box condition-input'
+    //       onChange={this.updateConditional('conditionInput')}/>
+    //   );
+    // }
+    //
+    // if (this.state.type === "number") {
+    //   subtype = (
+    //     <label className='secondary-section'>Sub-Type
+    //       <select value={this.state.subtype}
+    //         onChange={this.updateInput('subtype')}
+    //         className='dropdown-box subtype'>
+    //         <option value="greater-than">Greater than</option>
+    //         <option value="equals">Equals</option>
+    //         <option value="less-than">Less than</option>
+    //       </select>
+    //     </label>
+    //   );
+    // }
+    let subinputsKeys = [];
+    if (this.state.subinputs) {
+      subinputsKeys = Object.keys(this.state.subinputs);
+    }
+
+    let subinputs = (
+      subinputsKeys.map(subinput => {
+        let path = `${this.props.path}.subinputs.${subinput}`;
+        return (
+          <SubInput key={subinput} data={this.state.subinputs[subinput]}
+            subinput={subinput} parentState={this.parentState}
+            parentInfo={this.state} path={path}/> );
+          })
+    );
+
+    // if (this.state.type === 'yes/no') {
+    //   input = (
+    //     <select value={this.state.input} onChange={this.updateInput('input')}
+    //       className='input-box input'>
+    //       <option value='yes'>Yes</option>
+    //       <option value='no'>No</option>
+    //     </select>
+    //   );
+    // } else {
+    //   input = (
+    //     <input type='text'
+    //       value={this.state.input} className='input-box input'
+    //       onChange={this.updateInput('input')}/>
+    //   );
+    // }
 
     let margin = (this.props.path.split('.subinputs').length) * 25;
     let style = {marginLeft: `${margin}`};

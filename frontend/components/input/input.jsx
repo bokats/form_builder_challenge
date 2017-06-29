@@ -113,8 +113,7 @@ class Input extends React.Component {
     let keys = Object.keys(state[this.props.input].subinputs);
 
     for (let i = 0; i < keys.length; i++) {
-      state[this.props.input].subinputs[keys[i]][childParam]
-      = value;
+      state[this.props.input].subinputs[keys[i]][childParam] = value;
     }
   }
 

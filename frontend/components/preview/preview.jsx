@@ -54,7 +54,7 @@ class Preview extends React.Component {
           </div>
         );
       } else if (element.type === 'number') {
-        let field = "";
+        let field = element.input;
         if (element.subtype === 'greater-than') {
           field = `>${element.input}`;
         } else if (element.subtype === 'less-than') {
@@ -71,22 +71,26 @@ class Preview extends React.Component {
         if (element.input === 'yes') {
           inputs = (
             <div className='radio-buttons-container'>
-              <label>Yes
-                <input type='radio' value='Yes' checked readOnly/>
+              <input className='preview-radio' type='radio'
+                value='Yes' checked readOnly/>
+              <label className='radio-label'>Yes
               </label>
-              <label>No
-                <input type='radio' value='No' readOnly/>
+              <input className='preview-radio second-label' type='radio'
+                value='No' readOnly disabled/>
+              <label className='radio-label'>No
               </label>
             </div>
           );
         } else {
           inputs = (
             <div className='radio-buttons-container'>
-              <label>Yes
-                <input type='radio' value='Yes' readOnly/>
+              <input className='preview-radio' type='radio' value='Yes'
+                readOnly disabled/>
+              <label className='radio-label'>Yes
               </label>
-              <label>No
-                <input type='radio' value='No' checked readOnly/>
+              <input className='preview-radio second-label' type='radio'
+                value='No' checked readOnly/>
+              <label className='radio-label'>No
               </label>
             </div>
           );

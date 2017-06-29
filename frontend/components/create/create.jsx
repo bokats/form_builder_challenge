@@ -1,5 +1,5 @@
 import React from 'react';
-import { hashHistory, router } from 'react-router';
+import { hashHistory } from 'react-router';
 import Input from '../input/input';
 
 class Create extends React.Component {

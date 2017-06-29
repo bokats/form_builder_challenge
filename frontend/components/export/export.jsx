@@ -1,16 +1,20 @@
 import React from 'react';
-import { hashHistory, router } from 'react-router';
+import { hashHistory } from 'react-router';
 
 class Export extends React.Component {
   constructor(props) {
     super(props);
   }
 
+  convertToJSON() {
+    let currentState = JSON.parse(localStorage.getItem('formInputs'));
+    let parent = {json: currentState};
+    return JSON.stringify(parent);
+  }
+
   render() {
     return (
-      <div>
-        Export Component
-      </div>
+      <textarea className='json-textarea'>{this.convertToJSON()}</textarea>
     );
   }
 
